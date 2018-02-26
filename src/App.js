@@ -3,6 +3,8 @@ import 'reset-css/reset.css';
 import './App.css';
 import queryString from 'query-string';
 //import './data_server.js'
+var http = require('http');
+var https = require('https');
 
 let users = require('./data.json')
 
@@ -11,25 +13,9 @@ let defaultStyle = {
   color: "#ecebe8"
 };
 
-let users = [
-  {
-    num: '0',
-    name: "isaac",
-    email: "isaacallen73@gmail.com",
-    id: "isaacallen73",
-    topArtists: ["Kendrick Lamar", "J. Cole", "Drake"]
-  },
-  {
-    num: '1',
-    name: "Tyler",
-    email: "tyler@gmail.com",
-    id: "taj",
-    topArtists: ["Drake", "Migos", "Bryson Tiller"]
-  }
-]
-
-let counterStyle = {...defaultStyle, 
-  width: "40%", 
+let counterStyle = {
+  ...defaultStyle,
+  width: "40%",
   display: 'inline-block',
   'margin-bottom': '20px',
   'font-size': '20px',
@@ -44,13 +30,15 @@ class Filter extends Component {
   render() {
     return (
       <div style={defaultStyle}>
-        <img/>
-        <input type="text" onKeyUp={event => 
+        <img />
+        <input type="text" onKeyUp={event =>
           this.props.onTextChange(event.target.value)}
-          style={{...defaultStyle, 
-            color: 'black', 
-            'font-size': '20px', 
-            padding: '10px'}}/>
+          style={{
+            ...defaultStyle,
+            color: 'black',
+            'font-size': '20px',
+            padding: '10px'
+          }} />
       </div>
     );
   }
@@ -58,17 +46,20 @@ class Filter extends Component {
 
 class Profile extends Component {
   render() {
+
+
     let user = this.props.user
     return (
-      <div style={{...defaultStyle, 
+      <div style={{
+        ...defaultStyle,
         display: 'inline-block',
         width: "25%",
         padding: '10px',
-        }}>
+      }}>
         <h2>{user.name}</h2>
-        <ul style={{'margin-top': '10px', 'font-weight': 'bold'}}>
-          {user.topArtists.map(artist => 
-            <li style={{'passing-top': '2px'}}>{artist.name}</li>
+        <ul style={{ 'margin-top': '10px', 'font-weight': 'bold' }}>
+          {user.topArtists.map(artist =>
+            <li style={{ 'passing-top': '2px' }}>{artist.name}</li>
           )}
         </ul>
       </div>
@@ -76,23 +67,25 @@ class Profile extends Component {
   }
 }
 
+
 class Playlist extends Component {
   render() {
     let playlist = this.props.playlist
     return (
-      <div style={{...defaultStyle, 
-        display: 'inline-block', 
+      <div style={{
+        ...defaultStyle,
+        display: 'inline-block',
         width: "25%",
         padding: '10px',
-        'background-color': isEven(this.props.index) 
-          ? '#C0C0C0' 
+        'background-color': isEven(this.props.index)
+          ? '#C0C0C0'
           : '#808080'
-        }}>
+      }}>
         <h2>{playlist.name}</h2>
-        <img src={playlist.imageUrl} style={{width: '60px'}}/>
-        <ul style={{'margin-top': '10px', 'font-weight': 'bold'}}>
-          {playlist.songs.map(song => 
-            <li style={{'padding-top': '2px'}}>{song.name}</li>
+        <img src={playlist.imageUrl} style={{ width: '60px' }} />
+        <ul style={{ 'margin-top': '10px', 'font-weight': 'bold' }}>
+          {playlist.songs.map(song =>
+            <li style={{ 'padding-top': '2px' }}>{song.name}</li>
           )}
         </ul>
       </div>
@@ -100,33 +93,6 @@ class Playlist extends Component {
   }
 }
 
-class Title extends Component {
-  render() {
-    return (
-      <div>
-        <h1 style={{ color: "#84bd00" }}>{users[0].name}'s instafy</h1>
-      </div>
-    )
-  }
-}
-
-class TopArtists extends Component {
-  render () {
-    return (
-      <div>
-        <h3>
-          <ul>
-            <li>{
-              this.user.topArtists[0]
-              }</li>
-            <li>{users[0].topArtists[1]}</li>
-            <li>{users[0].topArtists[2]}</li>
-          </ul>
-        </h3>
-      </div>
-    )
-  }
-}
 
 class Search extends Component {
   render() {
@@ -144,9 +110,14 @@ class User extends Component {
     return (
       <div style={{ ...defaultStyle, width: "30%", display: "inline-block" }}>
         <img />
-        <h3>User</h3>
+        <h3>{users[1].name}</h3>
         <button>Create Playlist</button>
-        <ul><li>Genre 1</li><li>Genre 2</li><li>Genre 3</li></ul>
+        <ul>
+          <li>{users[1].topArtists[0]}</li>
+          <li>{users[1].topArtists[1]}</li>
+          <li>{users[1].topArtists[2]}</li>
+          <li>{users.length}</li>
+        </ul>
       </div>
     )
   }
@@ -155,19 +126,111 @@ class User extends Component {
 class App extends Component {
   constructor() {
     super();
-    this.users = {}
     this.state = {
-      serverData: {
-        users: []
-      },
+      user: null,
       filterString: ''
     }
   }
   componentDidMount() {
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed.access_token;
+    console.log('hello')
     if (!accessToken)
       return;
+    fetch('http://localhost:8888/getuserdata', {
+      //headers: {'Authorization': 'Bearer ' + accessToken},
+      method: 'GET'
+    })
+      .then(response => response.json())
+      .then(data => this.setState({
+            user: {
+              userID: data.userID,
+              longTermArtists: data.longTermArtists,
+              shortTermArtists: data.shortTermArtists,
+              longTermTracks: data.longTermTracks,
+              shortTermTracks: data.shortTermTracks,
+              country: data.country
+            }
+          }
+      ))
+  }
+
+  //       console.log(response);
+  /*
+          fetch('https://api.spotify.com/v1/me', {
+            headers: {'Authorization': 'Bearer ' + accessToken}})
+            .then(response => response.json())
+            .then(data => this.setState({
+              user: {
+                name: data.id
+            }
+          }))
+  */
+  /*        if (response.data && response.data.displayName.indexOf(' ') > 0) {
+            let displayName = " " + response.data.displayName.substring(0, response.data.displayName.indexOf(' '));
+          }
+          else if (response.data.displayName == null) {
+            let displayName = "";
+          }
+          if (response.data.imageURL.length > 0) {
+            let imageURL = response.data.imageURL[0].url;
+          } else {
+            let imageURL = null;
+          }
+          */
+  //        let longTermArtists = response.longTermArtists.items;
+  //        let shortTermArtists = response.data.shortTermArtists.items;
+  //        let longTermTracks = response.data.longTermTracks.items;
+  //        let shortTermTracks = response.data.shortTermTracks.items;
+
+  render() {
+    /*
+    let playlistToRender =
+      this.state.user.userID &&
+        this.state.playlists
+        ? this.state.playlists.filter(playlist => {
+          let matchesPlaylist = playlist.name.toLowerCase().includes(
+            this.state.filterString.toLowerCase())
+          let matchesSong = playlist.songs.find(song => song.name.toLowerCase()
+            .includes(this.state.filterString.toLowerCase()))
+          return matchesPlaylist || matchesSong
+        }) : []
+        */
+    return (
+      <div className="App">
+        {this.state.user ?
+          <div>
+            <h1 style={{ color: "#84bd00", fontSize:'32px' }}>{this.state.user.userID}'s instafy</h1>
+            <h3 style={{ color: "#84bd00" }}>Top Artists:
+              <ul>
+                <li>{this.state.user.shortTermArtists.items[0].name}</li>
+                <li>{this.state.user.shortTermArtists.items[1].name}</li>
+                <li>{this.state.user.shortTermArtists.items[2].name}</li>
+              </ul>
+            </h3>
+          <Search />
+          <User /><User /><User />
+        </div>
+      : <button onClick={() => {
+        window.location = window.location.href.includes('localhost')
+          ? 'http://localhost:8888/login'
+          : 'https://insta-fy-backend.herokuapp.com/login'
+         }
+         }
+           style={{ padding: '20px', 'font-size': '50px', 'margin-top': '20px' }}>Sign in with Spotify</button>
+      }
+      </div>
+    );
+  }
+}
+
+
+export default App;
+
+
+
+
+      /*
     fetch('https://api.spotify.com/v1/me', {
       headers: {'Authorization': 'Bearer ' + accessToken}})
       .then(response => response.json())
@@ -239,7 +302,8 @@ class App extends Component {
             .includes(this.state.filterString.toLowerCase()))
           return matchesPlaylist || matchesSong
         }) : []
-/*
+        
+
     return (
       <div className="App">
         {this.state.user ?
@@ -266,17 +330,3 @@ class App extends Component {
       </div>
     );
 */
-    return (
-      <div className="App">
-        <Title/>
-        <TopArtists/>
-        <Search/>
-        <User/><User/><User/>
-      </div>
-    );
-  }
-}
-
-export default App;
-
-
