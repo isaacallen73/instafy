@@ -1,0 +1,16 @@
+[
+    {
+      "num": 0,
+      "name": "isaac",
+      "email": "isaacallen73@gmail.com",
+      "id": "isaacallen73",
+      "topArtists": ["Kendrick Lamar", "J. Cole", "Drake"]
+    },
+    {
+      "num": 1,
+      "name": "Tyler",
+      "email": "tyler@gmail.com",
+      "id": "taj",
+      "topArtists": ["Drake", "Migos", "Bryson Tiller"]
+    }
+]

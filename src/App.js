@@ -2,11 +2,32 @@ import React, { Component } from 'react';
 import 'reset-css/reset.css';
 import './App.css';
 import queryString from 'query-string';
+//import './data_server.js'
 
+let users = require('./data.json')
+
+let white = 'white';
 let defaultStyle = {
-  color: '#fff',
-  'font-family': 'Papyrus'
+  color: "#ecebe8"
 };
+
+let users = [
+  {
+    num: '0',
+    name: "isaac",
+    email: "isaacallen73@gmail.com",
+    id: "isaacallen73",
+    topArtists: ["Kendrick Lamar", "J. Cole", "Drake"]
+  },
+  {
+    num: '1',
+    name: "Tyler",
+    email: "tyler@gmail.com",
+    id: "taj",
+    topArtists: ["Drake", "Migos", "Bryson Tiller"]
+  }
+]
+
 let counterStyle = {...defaultStyle, 
   width: "40%", 
   display: 'inline-block',
@@ -17,39 +38,6 @@ let counterStyle = {...defaultStyle,
 
 function isEven(number) {
   return number % 2
-}
-
-class PlaylistCounter extends Component {
-  render() {
-    let playlistCounterStyle = counterStyle
-    return (
-      <div style={playlistCounterStyle}>
-        <h2>{this.props.playlists.length} playlists</h2>
-      </div>
-    );
-  }
-}
-
-class HoursCounter extends Component {
-  render() {
-    let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
-      return songs.concat(eachPlaylist.songs)
-    }, [])
-    let totalDuration = allSongs.reduce((sum, eachSong) => {
-      return sum + eachSong.duration
-    }, 0)
-    let totalDurationHours = Math.round(totalDuration/60)
-    let isTooLow = totalDurationHours < 40
-    let hoursCounterStyle = {...counterStyle, 
-      color: isTooLow ? 'red' : 'white',
-      'font-weight': isTooLow ? 'bold' : 'normal',
-    }
-    return (
-      <div style={hoursCounterStyle}>
-        <h2>{totalDurationHours} hours</h2>
-      </div>
-    );
-  }
 }
 
 class Filter extends Component {
@@ -65,6 +53,26 @@ class Filter extends Component {
             padding: '10px'}}/>
       </div>
     );
+  }
+}
+
+class Profile extends Component {
+  render() {
+    let user = this.props.user
+    return (
+      <div style={{...defaultStyle, 
+        display: 'inline-block',
+        width: "25%",
+        padding: '10px',
+        }}>
+        <h2>{user.name}</h2>
+        <ul style={{'margin-top': '10px', 'font-weight': 'bold'}}>
+          {user.topArtists.map(artist => 
+            <li style={{'passing-top': '2px'}}>{artist.name}</li>
+          )}
+        </ul>
+      </div>
+    )
   }
 }
 
@@ -92,11 +100,66 @@ class Playlist extends Component {
   }
 }
 
+class Title extends Component {
+  render() {
+    return (
+      <div>
+        <h1 style={{ color: "#84bd00" }}>{users[0].name}'s instafy</h1>
+      </div>
+    )
+  }
+}
+
+class TopArtists extends Component {
+  render () {
+    return (
+      <div>
+        <h3>
+          <ul>
+            <li>{
+              this.user.topArtists[0]
+              }</li>
+            <li>{users[0].topArtists[1]}</li>
+            <li>{users[0].topArtists[2]}</li>
+          </ul>
+        </h3>
+      </div>
+    )
+  }
+}
+
+class Search extends Component {
+  render() {
+    return (
+      <div style={{ defaultStyle }}>
+        <img />
+        <input type="text" />
+      </div>
+    )
+  }
+}
+
+class User extends Component {
+  render() {
+    return (
+      <div style={{ ...defaultStyle, width: "30%", display: "inline-block" }}>
+        <img />
+        <h3>User</h3>
+        <button>Create Playlist</button>
+        <ul><li>Genre 1</li><li>Genre 2</li><li>Genre 3</li></ul>
+      </div>
+    )
+  }
+}
+
 class App extends Component {
   constructor() {
     super();
+    this.users = {}
     this.state = {
-      serverData: {},
+      serverData: {
+        users: []
+      },
       filterString: ''
     }
   }
@@ -106,13 +169,25 @@ class App extends Component {
     if (!accessToken)
       return;
     fetch('https://api.spotify.com/v1/me', {
-      headers: {'Authorization': 'Bearer ' + accessToken}
-    }).then(response => response.json())
-    .then(data => this.setState({
-      user: {
-        name: data.display_name
+      headers: {'Authorization': 'Bearer ' + accessToken}})
+      .then(response => response.json())
+      .then(data => this.setState({
+        user: {
+          name: data.id
       }
     }))
+
+    fetch('https://api.spotify.com/v1/me/top/artists?limit=50', {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken, 
+    }
+    }).then(response => response.json())
+    .then(artistData => this.setState({
+      user: {
+        topArtists: [artistData.items[0].name, artistData.items[1].name, artistData.items[2].name]
+      }
+    }))
+    
 
     fetch('https://api.spotify.com/v1/me/playlists', {
       headers: {'Authorization': 'Bearer ' + accessToken}
@@ -164,6 +239,7 @@ class App extends Component {
             .includes(this.state.filterString.toLowerCase()))
           return matchesPlaylist || matchesSong
         }) : []
+/*
     return (
       <div className="App">
         {this.state.user ?
@@ -174,8 +250,6 @@ class App extends Component {
           }}>
             {this.state.user.name}'s Playlists
           </h1>
-          <PlaylistCounter playlists={playlistToRender}/>
-          <HoursCounter playlists={playlistToRender}/>
           <Filter onTextChange={text => {
               this.setState({filterString: text})
             }}/>
@@ -191,90 +265,7 @@ class App extends Component {
         }
       </div>
     );
-  }
-}
-
-export default App;
-
-
-
-/*
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-
-let white = 'white';
-let defaultStyle = {
-  color: "#ecebe8"
-};
-
-let sampleUserData = [
-  {
-    name: "isaac",
-    email: "isaacallen73@gmail.com",
-    username: "isaacallen73",
-    topArtists: ["Kendrick Lamar", "J. Cole", "Drake"]
-  },
-  {
-    name: "Tyler",
-    email: "tyler@gmail.com",
-    username: "696969",
-    topArtists: ["Drake", "Migos", "Bryson Tiller"]
-  }
-]
-
-class Title extends Component {
-  render() {
-    return (
-      <div>
-        <h1 style={{ color: "#84bd00" }}>{sampleUserData[0].name}'s instafy</h1>
-      </div>
-    )
-  }
-}
-
-class TopArtists extends Component {
-  render () {
-    return (
-      <div>
-        <h3>
-          <ul>
-            <li>{sampleUserData[0].topArtists[0]}</li>
-            <li>{sampleUserData[0].topArtists[1]}</li>
-            <li>{sampleUserData[0].topArtists[2]}</li>
-          </ul>
-        </h3>
-      </div>
-    )
-  }
-}
-
-class Search extends Component {
-  render() {
-    return (
-      <div style={{ defaultStyle }}>
-        <img />
-        <input type="text" />
-      </div>
-    )
-  }
-}
-
-class User extends Component {
-  render() {
-    return (
-      <div style={{ ...defaultStyle, width: "30%", display: "inline-block" }}>
-        <img />
-        <h3>User</h3>
-        <button>Create Playlist</button>
-        <ul><li>Genre 1</li><li>Genre 2</li><li>Genre 3</li></ul>
-      </div>
-    )
-  }
-}
-
-class App extends Component {
-  render() {
+*/
     return (
       <div className="App">
         <Title/>
@@ -287,4 +278,5 @@ class App extends Component {
 }
 
 export default App;
-*/
+
+
