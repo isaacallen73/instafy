@@ -107,74 +107,32 @@ console.log(`Listening on port ${port}. Go /login to initiate authentication flo
 app.listen(port)
 
 /*
-        var userHistory = [];
-        var query = { "userID" : req.body.userID };
-        db.collection("users").find(query).toArray(function(err, result) {
-          if (err) throw err;
-  
-          if(result.length == 0){
-              userHistory.unshift(historyInstance);
-          }
-          else{
-              userHistory = result[0].userHistory;
-              if(moment().year() > userHistory[0].year){
-                  userHistory.unshift(historyInstance);
-              }
-              else{
-                  var differenceInDays = moment().dayOfYear() - userHistory[0].dayOfYear;
-                  if(differenceInDays > 21){
-                      userHistory.unshift(historyInstance);
-                  }
-              }
-          }
-  
-          db.collection("users").update(
-              {userID : req.body.userID},
-              {$set:
-                  {
-                      'longTermArtistIDs' : req.body.longTermArtistIDs,
-                      'longTermTrackIDs' : req.body.longTermTrackIDs,
-                  }
-              },
-              { upsert: true}
-          )
-  
-        });
+const express = require('express')
+const bodyParser = require('body-parser')
+const MongoClient = require('mongodb').MongoClient
+const app = express()
 
+var db;
 
+MongoClient.connect('mongodb://instafy:cornell@ds249428.mlab.com:49428/instafy', function(err, database) {
+  if (err) return console.log(err)
+  db = database
+  app.listen(8000, function () {
+    console.log('listening on port 8000')
+  })
+})
 
-        if(req.query.userID == undefined ||	req.query.obscurify_secret != obscurify_secret){
-		return res.send({"status" : "uh oh"});
-	}
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/index.html')
+})
 
-	MongoClient.connect(url, function(err, db) {
-	    if (err) throw err;
+app.post('/todo', function(req, res) {
+    console.log(req.body)
+    db.collection('todo').save(req.body, res, function (err, result){
+        if (err) return console.log('error')
 
-	    db.collection("users").find({userID : req.query.userID}, {
-			//only supposed to specify what you DON'T want returned
-			_id: false,
-			//userID: true,
-			email: false,
-			country: false,
-			longTermArtistIDs:false,
-			longTermTrackIDs:false,
-			obscurifyScore:false,
-			longTermAudioFeatures:false
-			//userHistory:true
-		}).toArray(function(err, result) {
-			if (err) throw err;
-			if(result[0] == undefined){
-				res.send({
-					'userID' : req.query.userID,
-					'userHistory' : null
-				});
-			}else{
-				res.send({
-					'userID' : req.query.userID,
-					'userHistory' : result[0].userHistory
-				});
-			}
-			//db.close();
-	    });
-	});
+        console.log('saved to db')
+        res.redirect('/')
+    })
+})
 */
