@@ -5,8 +5,7 @@ import queryString from 'query-string';
 //import './data_server.js'
 var http = require('http');
 var https = require('https');
-
-let users = require('./data.json')
+let dataServer = require('./data_server.js')
 
 let white = 'white';
 let defaultStyle = {
@@ -110,13 +109,13 @@ class User extends Component {
     return (
       <div style={{ ...defaultStyle, width: "30%", display: "inline-block" }}>
         <img />
-        <h3>{users[1].name}</h3>
+        <h3>users[1].name</h3>
         <button>Create Playlist</button>
         <ul>
-          <li>{users[1].topArtists[0]}</li>
-          <li>{users[1].topArtists[1]}</li>
-          <li>{users[1].topArtists[2]}</li>
-          <li>{users.length}</li>
+          <li>users[1].topArtists[0]</li>
+          <li>users[1].topArtists[1]</li>
+          <li>users[1].topArtists[2]</li>
+          <li>users.length</li>
         </ul>
       </div>
     )
@@ -153,6 +152,7 @@ class App extends Component {
             }
           }
       ))
+      dataServer.post(this.state.user)
   }
 
   //       console.log(response);

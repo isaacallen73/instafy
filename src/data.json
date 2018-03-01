@@ -8,9 +8,9 @@
     },
     {
       "num": 1,
-      "name": "Tyler",
-      "email": "tyler@gmail.com",
-      "id": "taj",
+      "name": "user",
+      "email": "user@gmail.com",
+      "id": "user",
       "topArtists": ["Drake", "Migos", "Bryson Tiller"]
     }
 ]
