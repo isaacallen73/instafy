@@ -5,16 +5,32 @@ import queryString from 'query-string';
 //import './data_server.js'
 var http = require('http');
 var https = require('https');
-let dataServer = require('./data_server.js')
+//let dataServer = require('./data_server.js')
 
 let white = 'white';
 let defaultStyle = {
   color: "#ecebe8"
 };
 
-let counterStyle = {
-  ...defaultStyle,
-  width: "40%",
+let users = [
+  {
+    num: '0',
+    name: "isaac",
+    email: "isaacallen73@gmail.com",
+    id: "isaacallen73",
+    topArtists: ["Kendrick Lamar", "J. Cole", "Drake"]
+  },
+  {
+    num: '1',
+    name: "Tyler",
+    email: "tyler@gmail.com",
+    id: "taj",
+    topArtists: ["Drake", "Migos", "Bryson Tiller"]
+  }
+]
+
+let counterStyle = {...defaultStyle, 
+  width: "40%", 
   display: 'inline-block',
   'margin-bottom': '20px',
   'font-size': '20px',
@@ -29,15 +45,13 @@ class Filter extends Component {
   render() {
     return (
       <div style={defaultStyle}>
-        <img />
-        <input type="text" onKeyUp={event =>
+        <img/>
+        <input type="text" onKeyUp={event => 
           this.props.onTextChange(event.target.value)}
-          style={{
-            ...defaultStyle,
-            color: 'black',
-            'font-size': '20px',
-            padding: '10px'
-          }} />
+          style={{...defaultStyle, 
+            color: 'black', 
+            'font-size': '20px', 
+            padding: '10px'}}/>
       </div>
     );
   }
@@ -45,20 +59,17 @@ class Filter extends Component {
 
 class Profile extends Component {
   render() {
-
-
     let user = this.props.user
     return (
-      <div style={{
-        ...defaultStyle,
+      <div style={{...defaultStyle, 
         display: 'inline-block',
         width: "25%",
         padding: '10px',
-      }}>
+        }}>
         <h2>{user.name}</h2>
-        <ul style={{ 'margin-top': '10px', 'font-weight': 'bold' }}>
-          {user.topArtists.map(artist =>
-            <li style={{ 'passing-top': '2px' }}>{artist.name}</li>
+        <ul style={{'margin-top': '10px', 'font-weight': 'bold'}}>
+          {user.topArtists.map(artist => 
+            <li style={{'passing-top': '2px'}}>{artist.name}</li>
           )}
         </ul>
       </div>
@@ -66,25 +77,23 @@ class Profile extends Component {
   }
 }
 
-
 class Playlist extends Component {
   render() {
     let playlist = this.props.playlist
     return (
-      <div style={{
-        ...defaultStyle,
-        display: 'inline-block',
+      <div style={{...defaultStyle, 
+        display: 'inline-block', 
         width: "25%",
         padding: '10px',
-        'background-color': isEven(this.props.index)
-          ? '#C0C0C0'
+        'background-color': isEven(this.props.index) 
+          ? '#C0C0C0' 
           : '#808080'
-      }}>
+        }}>
         <h2>{playlist.name}</h2>
-        <img src={playlist.imageUrl} style={{ width: '60px' }} />
-        <ul style={{ 'margin-top': '10px', 'font-weight': 'bold' }}>
-          {playlist.songs.map(song =>
-            <li style={{ 'padding-top': '2px' }}>{song.name}</li>
+        <img src={playlist.imageUrl} style={{width: '60px'}}/>
+        <ul style={{'margin-top': '10px', 'font-weight': 'bold'}}>
+          {playlist.songs.map(song => 
+            <li style={{'padding-top': '2px'}}>{song.name}</li>
           )}
         </ul>
       </div>
@@ -92,6 +101,33 @@ class Playlist extends Component {
   }
 }
 
+class Title extends Component {
+  render() {
+    return (
+      <div>
+        <h1 style={{ color: "#84bd00" }}>{users[0].name}'s instafy</h1>
+      </div>
+    )
+  }
+}
+
+class TopArtists extends Component {
+  render () {
+    return (
+      <div>
+        <h3>
+          <ul>
+            <li>{
+              this.user.topArtists[0]
+              }</li>
+            <li>{users[0].topArtists[1]}</li>
+            <li>{users[0].topArtists[2]}</li>
+          </ul>
+        </h3>
+      </div>
+    )
+  }
+}
 
 class Search extends Component {
   render() {
@@ -117,6 +153,9 @@ class User extends Component {
           <li>users[1].topArtists[2]</li>
           <li>users.length</li>
         </ul>
+        <h3>User</h3>
+        <button>Create Playlist</button>
+        <ul><li>Genre 1</li><li>Genre 2</li><li>Genre 3</li></ul>
       </div>
     )
   }
@@ -125,15 +164,17 @@ class User extends Component {
 class App extends Component {
   constructor() {
     super();
+    this.users = {}
     this.state = {
-      user: null,
+      serverData: {
+        users: []
+      },
       filterString: ''
     }
   }
   componentDidMount() {
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed.access_token;
-    console.log('hello')
     if (!accessToken)
       return;
     fetch('http://localhost:8888/getuserdata', {
@@ -152,7 +193,7 @@ class App extends Component {
             }
           }
       ))
-      dataServer.post(this.state.user)
+      //dataServer.post(this.state.user)
   }
 
   //       console.log(response);
@@ -302,8 +343,7 @@ export default App;
             .includes(this.state.filterString.toLowerCase()))
           return matchesPlaylist || matchesSong
         }) : []
-        
-
+/*
     return (
       <div className="App">
         {this.state.user ?
@@ -330,3 +370,6 @@ export default App;
       </div>
     );
 */
+
+
+

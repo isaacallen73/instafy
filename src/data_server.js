@@ -14,7 +14,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 const async = require('async');
 var moment = require('moment');
-//var mongo = require('mongodb');
+var mongo = require('mongodb');
 
 var app = express();
 
@@ -102,6 +102,9 @@ app.get('/api/getUserHistory', function (req, res) {
     });
 
 });
+let port = process.env.PORT || 3001
+console.log(`Listening on port ${port}. Go /login to initiate authentication flow.`)
+app.listen(port)
 
 /*
         var userHistory = [];
